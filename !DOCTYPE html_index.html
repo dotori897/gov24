@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<meta name="color-scheme" content="light dark">
+<title>정부24 · 모바일 민증</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="정부24">
+<style>
+  :root{
+    --bg:#ffffff; --fg:#111827; --muted:#6b7280;
+    --card:#ffffff; --input:#f9fafb; --border:#e5e7eb;
+    --soft:#f3f4f6; --primary:#1d4ed8; --secondary:#f3f4f6; --secondary-fg:#111827;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f1115; --fg:#e8eaed; --muted:#9aa0a6;
+      --card:#171a21; --input:#1d2129; --border:#2a2f3a;
+      --soft:#22262f; --primary:#4c8dff; --secondary:#22262f; --secondary-fg:#e8eaed;
+    }
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--bg); color:var(--fg); }
+  body{ font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif; font-size:14px; -webkit-text-size-adjust:100%; }
+  #app{ position:relative; max-width:1100px; margin:0 auto; }
+  .hide{ display:none !important; }
+
+  .hd{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-bottom:1px solid var(--border); position:relative; }
+  .hd-l{ display:flex; align-items:center; gap:14px; }
+  .burger{ display:none; flex-direction:column; gap:4px; cursor:pointer; padding:4px; }
+  .burger i{ display:block; width:20px; height:2px; background:var(--fg); border-radius:2px; }
+  .logo{ font-size:24px; font-weight:700; color:var(--primary); cursor:pointer; user-select:none; padding:2px 4px; border-radius:6px; }
+  .nav{ display:flex; gap:16px; }
+  .navi{ font-size:14px; color:var(--muted); cursor:pointer; }
+  .navi.on{ color:var(--fg); font-weight:500; }
+  .hd-r{ display:flex; align-items:center; gap:8px; }
+  .login{ background:var(--primary); color:#fff; border:0; border-radius:8px; padding:7px 14px; font-size:13px; font-weight:500; cursor:pointer; }
+  .inst{ display:flex; align-items:center; gap:5px; background:var(--secondary); color:var(--secondary-fg); border:1px solid var(--border); border-radius:8px; padding:7px 12px; font-size:13px; cursor:pointer; }
+  .inst svg{ width:15px; height:15px; }
+
+  .crumb{ font-size:12px; color:var(--muted); padding:10px 14px 0; }
+  .hero{ padding:20px 14px 6px; }
+  .hero-t{ font-size:22px; font-weight:500; margin-bottom:14px; }
+  .search{ display:flex; align-items:center; gap:8px; background:var(--input); border:2px solid var(--primary); border-radius:12px; padding:4px 4px 4px 12px; }
+  .sicon{ width:18px; height:18px; color:var(--muted); flex:none; }
+  .search input{ flex:1; min-width:0; border:0; background:transparent; color:var(--fg); font-size:16px; padding:12px 0; outline:none; }
+  .sgo{ background:var(--primary); color:#fff; border:0; border-radius:9px; padding:11px 18px; font-size:14px; font-weight:500; cursor:pointer; }
+  .tags{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .tag{ font-size:12px; color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:5px 12px; cursor:pointer; }
+
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:22px 14px; }
+  .svc{ display:flex; align-items:center; gap:12px; border:1px solid var(--border); border-radius:12px; padding:14px; cursor:pointer; background:var(--card); }
+  .svc-ico{ width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .svc-ico svg{ width:22px; height:22px; }
+  .svc-ico.blue{ background:rgba(59,130,246,.14); color:#3b82f6; }
+  .svc-ico.gray{ background:var(--soft); color:var(--muted); }
+  .svc-b{ flex:1; min-width:0; }
+  .svc-t{ font-size:14px; font-weight:500; }
+  .svc-d{ font-size:12px; color:var(--muted); margin-top:2px; }
+  .svc-go{ color:var(--muted); font-size:18px; }
+  #netDot{ font-size:13px; color:#22c55e; }
+
+  .ft{ border-top:1px solid var(--border); padding:16px 14px 24px; margin-top:6px; }
+  .ft-cols{ display:flex; gap:26px; flex-wrap:wrap; font-size:12px; }
+  .ft-m{ color:var(--muted); }
+  .ft-note{ font-size:12px; color:var(--muted); margin-top:10px; }
+
+  .cardwrap{ padding:26px 14px; display:flex; justify-content:center; }
+  .phone{ width:340px; max-width:100%; border:1px solid var(--border); border-radius:20px; background:var(--card); overflow:hidden; }
+  .cardtop{ position:relative; padding:22px 22px 10px; }
+  .photo{ width:150px; height:180px; margin:0 auto; border-radius:10px; overflow:hidden; background:var(--soft); }
+  .photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .qrbox{ position:absolute; right:22px; top:22px; background:#fff; padding:4px; border-radius:6px; }
+  .name{ font-size:30px; font-weight:700; margin-top:14px; }
+  .rows{ padding:6px 22px 0; }
+  .row{ display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-bottom:1px solid var(--border); }
+  .rl{ font-size:12px; color:var(--muted); }
+  .rv{ font-size:15px; font-weight:500; }
+  .mono{ font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace; }
+  .addr{ padding:14px 22px 0; font-size:15px; font-weight:500; }
+  .timer{ padding:14px 22px 0; }
+  .tbar{ height:8px; border-radius:999px; background:var(--soft); overflow:hidden; }
+  .tbar i{ display:block; height:100%; width:100%; background:var(--primary); }
+  .trow{ display:flex; justify-content:space-between; margin-top:7px; }
+  .tl{ font-size:12px; color:var(--muted); }
+  .tv{ font-size:12px; font-weight:500; }
+  .hint{ text-align:center; font-size:12px; color:var(--muted); padding:16px 22px; }
+  .detail{ display:block; width:calc(100% - 44px); margin:0 22px; background:var(--primary); color:#fff; border:0; border-radius:10px; padding:14px; font-size:15px; font-weight:500; cursor:pointer; }
+  .back{ text-align:center; font-size:13px; color:var(--muted); padding:14px; cursor:pointer; }
+  .ticker{ position:relative; overflow:hidden; background:linear-gradient(90deg,#4a72d4,#7c5cf0); padding:10px 0; margin-top:4px; }
+  .ticker-track{ display:flex; width:max-content; animation:slide 22s linear infinite; }
+  .ticker-track span{ white-space:nowrap; color:#fff; font-size:12px; font-weight:500; }
+  @keyframes slide{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+
+  .overlay{ position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; padding:18px; z-index:100; }
+  .sheet{ width:100%; max-width:440px; background:var(--card); color:var(--fg); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+  .sheet-h{ display:flex; justify-content:space-between; align-items:center; padding:16px 18px; border-bottom:1px solid var(--border); }
+  .sheet-t{ font-size:16px; font-weight:500; }
+  .sheet-x{ cursor:pointer; color:var(--muted); }
+  .sheet-b{ padding:16px 18px; max-height:60vh; overflow-y:auto; }
+  .frow{ margin-bottom:14px; }
+  .frow label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+  .frow input{ width:100%; background:var(--input); color:var(--fg); border:1px solid var(--border); border-radius:9px; padding:11px 12px; font-size:16px; outline:none; }
+  .ph-up{ display:flex; gap:14px; align-items:center; }
+  .ph-prev{ width:76px; height:92px; border-radius:8px; overflow:hidden; background:var(--soft); flex:none; }
+  .ph-prev img{ width:100%; height:100%; object-fit:cover; }
+  .ph-txt{ display:flex; flex-direction:column; gap:6px; }
+  .sm{ background:var(--secondary); color:var(--secondary-fg); border:1px solid var(--border); border-radius:8px; padding:8px 14px; font-size:13px; cursor:pointer; }
+  .hint2{ font-size:11px; color:var(--muted); }
+  .sheet-f{ display:flex; gap:10px; padding:14px 18px; border-top:1px solid var(--border); }
+  .ghost{ flex:1; background:var(--secondary); color:var(--secondary-fg); border:1px solid var(--border); border-radius:9px; padding:12px; font-size:14px; cursor:pointer; }
+  .primary{ flex:2; background:var(--primary); color:#fff; border:0; border-radius:9px; padding:12px; font-size:14px; font-weight:500; cursor:pointer; }
+  .gstep{ margin-bottom:14px; }
+  .gstep p{ margin:5px 0 0; font-size:13px; color:var(--muted); line-height:1.5; }
+
+  @media (max-width:640px){
+    .burger{ display:flex; }
+    .nav{ position:absolute; top:100%; left:14px; right:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; flex-direction:column; gap:0; padding:6px; z-index:20; display:none; }
+    .nav.open{ display:flex; }
+    .navi{ padding:11px 12px; border-radius:8px; font-size:15px; }
+    .grid{ grid-template-columns:1fr; }
+    .hero-t{ font-size:20px; }
+    .ft-cols{ flex-direction:column; gap:10px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="hd">
+    <div class="hd-l">
+      <div class="burger" id="burger"><i></i><i></i><i></i></div>
+      <div class="logo" id="logo" title="더블클릭하면 내 정보를 입력할 수 있어요">정부24</div>
+    </div>
+    <nav class="nav" id="nav">
+      <span class="navi on">민원·서비스</span>
+      <span class="navi">정책·정보</span>
+      <span class="navi">생활정보</span>
+      <span class="navi">나의 정부24</span>
+    </nav>
+    <div class="hd-r">
+      <button class="inst" id="installBtn"><svg viewBox="0 0 24 24"><path d="M12 3v11m0 0l-4-4m4 4l4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>앱 설치</button>
+      <button class="login">로그인</button>
+    </div>
+  </header>
+
+  <div class="crumb">홈 &nbsp;›&nbsp; 민원·서비스 &nbsp;›&nbsp; <b>모바일 민증 확인</b></div>
+
+  <section class="hero">
+    <div class="hero-t">무엇을 도와드릴까요?</div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" class="sicon"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="q" placeholder="민원·서비스 검색  (예: 주민등록등본)">
+      <button class="sgo">검색</button>
+    </div>
+    <div class="tags">
+      <span class="tag">주민등록등본</span><span class="tag">전입신고</span><span class="tag">모바일 민증</span><span class="tag">건강보험 자격득실</span>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="svc" id="svcId">
+      <div class="svc-ico blue"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="11" r="2.4" fill="currentColor"/><path d="M5 17c.8-2 2.3-3 4-3s3.2 1 4 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="14.5" y1="10" x2="18" y2="10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="14.5" y1="13" x2="18" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div class="svc-b"><div class="svc-t">모바일 민증 확인</div><div class="svc-d">휴대폰으로 신분증을 제시하고 QR로 확인</div></div><div class="svc-go">›</div>
+    </div>
+    <div class="svc" id="svcEdit">
+      <div class="svc-ico gray"><svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16v4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><line x1="13.5" y1="6.5" x2="17.5" y2="10.5" stroke="currentColor" stroke-width="1.8"/></svg></div>
+      <div class="svc-b"><div class="svc-t">내 정보 입력</div><div class="svc-d">이름·생년월일·주민등록번호·주소·증명사진</div></div><div class="svc-go">›</div>
+    </div>
+    <div class="svc" id="svcOffline">
+      <div class="svc-ico gray"><svg viewBox="0 0 24 24"><path d="M5 12.5a7 7 0 0113.5-2.5A4.5 4.5 0 0117.5 19H7a4.5 4.5 0 01-2-8.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 12v4m0 0l-2-2m2 2l2-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="svc-b"><div class="svc-t">오프라인 상태</div><div class="svc-d">네트워크 연결 상태 확인</div></div><div class="svc-go" id="netDot">●</div>
+    </div>
+    <div class="svc"><div class="svc-ico gray"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><line x1="8" y1="8" x2="16" y2="8" stroke="currentColor" stroke-width="1.8"/><line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="1.8"/></svg></div><div class="svc-b"><div class="svc-t">주민등록등·초본</div><div class="svc-d">발급 및 PDF 저장</div></div><div class="svc-go">›</div></div>
+  </section>
+
+  <footer class="ft">
+    <div class="ft-cols">
+      <div><b>정부24</b><br><span class="ft-m">대한민국 정부 민원포털</span></div>
+      <div><span class="ft-m">개인정보처리방침 · 이용약관 · 저작권 정책</span></div>
+      <div><span class="ft-m">help@gov24.go.kr · 1588-0000</span></div>
+    </div>
+    <div class="ft-note">로고(정부24)를 <b>더블클릭</b>하면 내 정보를 넣을 수 있어요.</div>
+  </footer>
+
+  <section id="cardView" class="cardwrap hide">
+    <div class="phone">
+      <div class="cardtop">
+        <div class="photo"><img id="photoImg" alt="증명사진"></div>
+        <div class="qrbox"><div id="qr"></div></div>
+        <div class="name" id="cName">김현욱</div>
+      </div>
+      <div class="rows">
+        <div class="row"><span class="rl">생년월일</span><span class="rv" id="cBirth">2007-09-07</span></div>
+        <div class="row"><span class="rl">주민등록번호</span><span class="rv mono" id="cRrn">070907-3••••••</span></div>
+      </div>
+      <div class="addr" id="cAddr">인천광역시 부평구 장제로 76번길 25</div>
+      <div class="timer">
+        <div class="tbar"><i id="tfill"></i></div>
+        <div class="trow"><span class="tl">남은시간</span><span class="tv" id="tsec">30초</span></div>
+      </div>
+      <div class="hint">QR코드를 폰 카메라로 찍어보세요</div>
+      <button class="detail" id="detailBtn">상세정보 표시</button>
+      <div class="back" id="backBtn">← 처음으로</div>
+      <div class="ticker"><div class="ticker-track" id="track"></div></div>
+    </div>
+  </section>
+</div>
+
+<div id="modal" class="overlay hide">
+  <div class="sheet">
+    <div class="sheet-h"><div class="sheet-t">내 정보 입력</div><div class="sheet-x" id="closeBtn">✕</div></div>
+    <div class="sheet-b">
+      <div class="frow"><label>증명사진</label>
+        <div class="ph-up"><div class="ph-prev"><img id="prevImg" alt="미리보기"></div>
+        <div class="ph-txt"><button class="sm" id="pickBtn">사진 선택</button><span class="hint2">정사각형에 가까운 사진이 좋아요</span><input type="file" id="file" accept="image/*" hidden></div></div>
+      </div>
+      <div class="frow"><label>이름</label><input id="fName"></div>
+      <div class="frow"><label>생년월일</label><input id="fBirth"></div>
+      <div class="frow"><label>주민등록번호</label><input id="fRrn"></div>
+      <div class="frow"><label>주소</label><input id="fAddr"></div>
+    </div>
+    <div class="sheet-f"><button class="ghost" id="resetBtn">기본값</button><button class="primary" id="saveBtn">저장</button></div>
+  </div>
+</div>
+
+<div id="guide" class="overlay hide">
+  <div class="sheet">
+    <div class="sheet-h"><div class="sheet-t">홈 화면에 앱으로 추가</div><div class="sheet-x" id="guideX">✕</div></div>
+    <div class="sheet-b">
+      <div class="gstep"><b>iPhone (Safari)</b><p>하단 공유 버튼 □↑ → 홈 화면에 추가 → 추가</p></div>
+      <div class="gstep"><b>Android (Chrome)</b><p>우측 상단 ⋮ → 앱 설치 또는 홈 화면에 추가</p></div>
+    </div>
+    <div class="sheet-f"><button class="primary" id="guideOk">확인</button></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i);};
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+  }
+  var deferred=null;
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferred=e; });
+  $('installBtn').addEventListener('click', function(){
+    if(deferred){ deferred.prompt(); deferred=null; } else { $('guide').classList.remove('hide'); }
+  });
+  $('guideX').addEventListener('click', function(){ $('guide').classList.add('hide'); });
+  $('guideOk').addEventListener('click', function(){ $('guide').classList.add('hide'); });
+
+  var KEY='gov24_profile_v1';
+  var DEF={ name:'김현욱', birth:'2007-09-07', rrn:'070907-3185011', addr:'인천광역시 부평구 장제로 76번길 25', photo:'' };
+  var DEF_PHOTO='data:image/svg+xml;utf8,'+encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120'><rect width='100' height='120' fill='#e7e2d6'/><circle cx='50' cy='46' r='24' fill='#f6d9a8'/><path d='M26 40c2-16 12-22 24-22s22 6 24 22c-6-6-14-9-24-9s-18 3-24 9z' fill='#3a2b1e'/><circle cx='42' cy='47' r='2.6' fill='#2b2118'/><circle cx='58' cy='47' r='2.6' fill='#2b2118'/><circle cx='36' cy='54' r='4' fill='#f2a0a0' opacity='.8'/><circle cx='64' cy='54' r='4' fill='#f2a0a0' opacity='.8'/><path d='M45 58q5 4 10 0' fill='none' stroke='#b06a4a' stroke-width='2' stroke-linecap='round'/><path d='M20 120c0-18 13-30 30-30s30 12 30 30z' fill='#f0c04a'/></svg>");
+  var st=load();
+  function load(){ try{ var r=localStorage.getItem(KEY); if(r) return JSON.parse(r);}catch(e){} return JSON.parse(JSON.stringify(DEF)); }
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){} }
+  function photoSrc(){ return st.photo||DEF_PHOTO; }
+  function maskRrn(r){ if(!r) return ''; var p=r.split('-'); return p.length===2 ? p[0]+'-'+p[1].charAt(0)+'••••••' : r; }
+  var revealed=false;
+
+  function renderCard(){
+    $('photoImg').src=photoSrc();
+    $('cName').textContent=st.name||'이름 없음';
+    $('cBirth').textContent=st.birth||'-';
+    $('cAddr').textContent=st.addr||'-';
+    $('cRrn').textContent=revealed?(st.rrn||'-'):maskRrn(st.rrn);
+    $('detailBtn').textContent=revealed?'상세정보 숨기기':'상세정보 표시';
+  }
+  function makeQR(){
+    var box=$('qr'); box.innerHTML='';
+    if(typeof QRCode==='undefined'){ box.innerHTML='<div style="width:110px;height:110px"></div>'; return; }
+    new QRCode(box,{text:[st.name,st.birth,st.rrn,st.addr].join('|')+'|'+Date.now(),width:110,height:110,colorDark:'#111111',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  }
+  var timer=null;
+  function startTimer(){
+    clearInterval(timer); var total=30, t0=performance.now();
+    $('tfill').style.width='100%'; $('tsec').textContent='30초';
+    timer=setInterval(function(){
+      var rem=Math.max(0,total-(performance.now()-t0)/1000);
+      $('tfill').style.width=(rem/total*100)+'%'; $('tsec').textContent=Math.ceil(rem)+'초';
+      if(rem<=0){ t0=performance.now(); makeQR(); }
+    },100);
+  }
+  function openCard(){ revealed=false; renderCard(); makeQR(); startTimer(); $('cardView').classList.remove('hide'); ['.hero','.grid','.crumb'].forEach(function(s){document.querySelector(s).classList.add('hide');}); window.scrollTo(0,0); }
+  function closeCard(){ clearInterval(timer); $('cardView').classList.add('hide'); ['.hero','.grid','.crumb'].forEach(function(s){document.querySelector(s).classList.remove('hide');}); }
+  function openModal(){ $('fName').value=st.name||''; $('fBirth').value=st.birth||''; $('fRrn').value=st.rrn||''; $('fAddr').value=st.addr||''; $('prevImg').src=photoSrc(); $('modal').classList.remove('hide'); }
+  function closeModal(){ $('modal').classList.add('hide'); }
+  function onSave(){
+    st.name=$('fName').value.trim()||DEF.name; st.birth=$('fBirth').value.trim()||DEF.birth;
+    st.rrn=$('fRrn').value.trim()||DEF.rrn; st.addr=$('fAddr').value.trim()||DEF.addr;
+    save(); renderCard(); if(!$('cardView').classList.contains('hide')) makeQR(); closeModal();
+  }
+
+  var track=$('track'), unit='캡쳐방지 시스템이 작동 중입니다. &nbsp;·&nbsp; ', html='';
+  for(var i=0;i<8;i++) html+='<span>'+unit+'</span>';
+  track.innerHTML='<div style="display:flex">'+html+'</div><div style="display:flex">'+html+'</div>';
+
+  function net(){ var on=navigator.onLine; $('netDot').style.color=on?'#22c55e':'#ef4444'; }
+  window.addEventListener('online',net); window.addEventListener('offline',net); net();
+  $('svcOffline').addEventListener('click',net);
+
+  $('logo').addEventListener('dblclick',openModal);
+  $('svcEdit').addEventListener('click',openModal);
+  $('svcId').addEventListener('click',openCard);
+  $('backBtn').addEventListener('click',closeCard);
+  $('closeBtn').addEventListener('click',closeModal);
+  $('saveBtn').addEventListener('click',onSave);
+  $('resetBtn').addEventListener('click',function(){ st=JSON.parse(JSON.stringify(DEF)); save(); $('prevImg').src=DEF_PHOTO; $('fName').value=DEF.name; $('fBirth').value=DEF.birth; $('fRrn').value=DEF.rrn; $('fAddr').value=DEF.addr; renderCard(); });
+  $('detailBtn').addEventListener('click',function(){ revealed=!revealed; renderCard(); });
+  $('pickBtn').addEventListener('click',function(){ $('file').click(); });
+  $('file').addEventListener('change',function(e){ var f=e.target.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(ev){ st.photo=ev.target.result; save(); $('prevImg').src=st.photo; renderCard(); }; r.readAsDataURL(f); });
+  $('modal').addEventListener('click',function(e){ if(e.target===$('modal')) closeModal(); });
+  $('q').addEventListener('keydown',function(e){ if(e.key==='Enter') openCard(); });
+  document.querySelectorAll('.tag').forEach(function(t){ t.addEventListener('click',function(){ $('q').value=t.textContent; }); });
+  $('burger').addEventListener('click',function(){ $('nav').classList.toggle('open'); });
+  document.querySelectorAll('.navi').forEach(function(n){ n.addEventListener('click',function(){ $('nav').classList.remove('open'); }); });
+
+  renderCard();
+})();
+</script>
+</body>
+</html>
